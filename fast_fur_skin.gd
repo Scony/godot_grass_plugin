@@ -1,6 +1,8 @@
 tool
 extends Spatial
 
+export (NodePath) var np = null
+
 var FAST_FUR_SKIN_SHADER = preload("res://addons/fast_fur_skin/fast_fur_skin.shader")
 var FAST_FUR_SKIN_BASE_SHADER = preload("res://addons/fast_fur_skin/fast_fur_skin_base.shader")
 
@@ -46,9 +48,9 @@ func get_base_material():
 	return mat
 	
 func apply_material(node, material):
-	var active_mat = node.get_surface_material(0)
+	var active_mat = node.material_override
 	if active_mat == null or CustomSkinMaterial == false:
-		node.set_surface_material(0, material)
+		node.material_override = material
 	else:
 		active_mat.next_pass = material.next_pass;
 
@@ -58,10 +60,15 @@ func generate():
 	for i in range(0, SkinLayers):
 		next_mat.next_pass = generate_grass_shaders(i)
 		next_mat = next_mat.next_pass
-	for node in get_children():
+	# for node in get_children():
+	# 	if node.is_class("MeshInstance"):
+	# 		apply_material(node, mat)
+	if np != null:
+		var node = get_node(np)
 		if node.is_class("MeshInstance"):
 			apply_material(node, mat)
-	
+	print('done')
+
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
